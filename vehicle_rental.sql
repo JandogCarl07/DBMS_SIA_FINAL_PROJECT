@@ -29,6 +29,63 @@ CREATE TABLE vehicle_categories (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+--  7. rate_plans   (Daily 1-6 days, Weekly 7-29, Monthly 30+, seasonal)
+-- ---------------------------------------------------------------------
+CREATE TABLE rate_plans (
+  rate_plan_id INT AUTO_INCREMENT PRIMARY KEY,
+  category_id  INT           NOT NULL,
+  plan_name    VARCHAR(50)   NOT NULL,
+  rate_per_day DECIMAL(10,2) NOT NULL,
+  min_days     INT           NOT NULL DEFAULT 1,
+  max_days     INT           NULL,
+  season_start DATE          NULL,
+  season_end   DATE          NULL,
+  CONSTRAINT chk_rate_amount  CHECK (rate_per_day > 0),
+  CONSTRAINT chk_rate_days    CHECK (min_days >= 1 AND (max_days IS NULL OR max_days >= min_days)),
+  CONSTRAINT chk_rate_season  CHECK (season_end IS NULL OR season_start IS NULL OR season_end >= season_start),
+  CONSTRAINT fk_rate_category FOREIGN KEY (category_id) REFERENCES vehicle_categories(category_id)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  8. insurance
+-- ---------------------------------------------------------------------
+CREATE TABLE insurance (
+  insurance_id    INT AUTO_INCREMENT PRIMARY KEY,
+  vehicle_id      INT           NOT NULL,
+  provider        VARCHAR(100)  NOT NULL,
+  policy_number   VARCHAR(50)   NOT NULL UNIQUE,
+  coverage_type   ENUM('Comprehensive','Third-Party','Collision') NOT NULL,
+  coverage_amount DECIMAL(12,2) NOT NULL,
+  start_date      DATE          NOT NULL,
+  expiry_date     DATE          NOT NULL,
+  CONSTRAINT chk_ins_amount CHECK (coverage_amount > 0),
+  CONSTRAINT chk_ins_dates  CHECK (expiry_date > start_date),
+  CONSTRAINT fk_ins_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  INDEX idx_ins_vehicle_expiry (vehicle_id, expiry_date)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+--  9. maintenance_records
+-- ---------------------------------------------------------------------
+CREATE TABLE maintenance_records (
+  maintenance_id       INT AUTO_INCREMENT PRIMARY KEY,
+  vehicle_id           INT           NOT NULL,
+  service_type         VARCHAR(100)  NOT NULL,
+  description          TEXT,
+  service_date         DATE          NOT NULL,
+  next_service_date    DATE          NULL,
+  next_service_mileage INT UNSIGNED  NULL,
+  cost                 DECIMAL(10,2) NOT NULL DEFAULT 0,
+  status               ENUM('Scheduled','In Progress','Completed') NOT NULL DEFAULT 'Scheduled',
+  CONSTRAINT chk_maint_cost  CHECK (cost >= 0),
+  CONSTRAINT chk_maint_dates CHECK (next_service_date IS NULL OR next_service_date >= service_date),
+  CONSTRAINT fk_maint_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  INDEX idx_maint_vehicle_date (vehicle_id, service_date, status)
+) ENGINE=InnoDB;
+-- ---------------------------------------------------------------------
 --  14. rental_status_history
 -- ---------------------------------------------------------------------
 CREATE TABLE rental_status_history (
