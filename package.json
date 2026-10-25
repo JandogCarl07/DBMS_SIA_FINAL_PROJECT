@@ -1,0 +1,23 @@
+{
+  "name": "dbms---sia---system",
+  "version": "1.0.0",
+  "description": "DBMS Final",
+  "homepage": "https://github.com/JandogCarl07/DBMS_SIA_FINAL_PROJECT#readme",
+  "bugs": {
+    "url": "https://github.com/JandogCarl07/DBMS_SIA_FINAL_PROJECT/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/JandogCarl07/DBMS_SIA_FINAL_PROJECT.git"
+  },
+  "license": "ISC",
+  "author": "Jandog, Oira, Encarguez, Duran, Garcia, Jundarino",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
