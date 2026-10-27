@@ -29,6 +29,84 @@ CREATE TABLE vehicle_categories (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- 4. customers
+-- ---------------------------------------------------------------------
+CREATE TABLE customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    middle_name VARCHAR(50),
+    last_name VARCHAR(50) NOT NULL,
+    birth_date DATE NOT NULL,
+    gender ENUM('Male','Female','Other') NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(20) NOT NULL,
+    street VARCHAR(150) NOT NULL,
+    barangay VARCHAR(100) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    province VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(10) NOT NULL,
+    license_number VARCHAR(30) NOT NULL UNIQUE,
+    license_expiry_date DATE NOT NULL,
+    emergency_contact_name VARCHAR(100) NOT NULL,
+    emergency_contact_phone VARCHAR(20) NOT NULL,
+    date_registered DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('Active','Blacklisted') NOT NULL DEFAULT 'Active',
+
+    -- a driver's license can only be held from age 18 onward
+    CONSTRAINT chk_customer_dates CHECK (license_expiry_date > DATE_ADD(birth_date, INTERVAL 18 YEAR)),
+    INDEX idx_cust_name (last_name, first_name)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- 5. employees
+-- ---------------------------------------------------------------------
+CREATE TABLE employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_id INT NOT NULL,
+    branch_id INT NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(20) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL, -- store a HASH, never the real password
+    hire_date DATE NOT NULL,
+    status ENUM('Active','Inactive') NOT NULL DEFAULT 'Active',
+    CONSTRAINT fk_emp_role FOREIGN KEY (role_id) REFERENCES roles(role_id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_emp_branch FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- 6. vehicles
+-- ---------------------------------------------------------------------
+CREATE TABLE vehicles (
+    vehicle_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT NOT NULL,
+    branch_id INT NOT NULL,
+    plate_number VARCHAR(15) NOT NULL UNIQUE,
+    brand VARCHAR(50) NOT NULL,
+    model VARCHAR(50) NOT NULL,
+    year SMALLINT NOT NULL,
+    color VARCHAR(30) NOT NULL,
+    transmission ENUM('Manual','Automatic') NOT NULL,
+    fuel_type ENUM('Gasoline','Diesel','Electric','Hybrid') NOT NULL,
+    seats TINYINT UNSIGNED NOT NULL,
+    mileage INT UNSIGNED NOT NULL DEFAULT 0,
+    status ENUM('Available','Reserved','Rented','Maintenance','Unavailable')
+    NOT NULL DEFAULT 'Available',
+
+    CONSTRAINT chk_vehicle_year CHECK (year BETWEEN 1990 AND 2100),
+    CONSTRAINT chk_vehicle_seats CHECK (seats > 0),
+    CONSTRAINT fk_veh_category FOREIGN KEY (category_id) REFERENCES vehicle_categories(category_id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_veh_branch FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+    INDEX idx_veh_status (status)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 --  7. rate_plans   (Daily 1-6 days, Weekly 7-29, Monthly 30+, seasonal)
 -- ---------------------------------------------------------------------
 CREATE TABLE rate_plans (
