@@ -6,6 +6,7 @@
 
 **Group Members and Responsibilities**
 |             Member              |      GitHub Username      |                  Assigned Tables                 |
+|---------------------------------|---------------------------|--------------------------------------------------|
 | Kenneth Duran                   |      [sleepy028]          | `rate_plans`, `insurance`, `maintenance_records` |
 | Ken Shinn B. Encarguez          |      [KenziiKen]          | `customers`, `employees`, `vehicles`             |
 | Samantha Yatoc Garcia           |      [samantha5357]       | `payments`, `late_fees`                          |
@@ -15,6 +16,7 @@
 
 **Feature Assignments**
 |       Member       |      Endpoints / Screens      |      JOIN Reports and Types       |      Feature Role         |
+|--------------------|-------------------------------|-----------------------------------|---------------------------|
 | Duran              | To be determined              | To be determined                  | To be determined          |
 | Encarguez          | To be determined              | To be determined                  | To be determined          |
 | Garcia             | To be determined              | To be determined                  | To be determined          |
