@@ -2,6 +2,7 @@
 *Group 3*
 
 **Section:** A
+
 **Proposed System Title:** Vehicle Rental System
 
 **Group Members and Responsibilities**
@@ -14,6 +15,7 @@
 | Shaira M. Jundarino             |      [sjndrno]            | `roles`, `branches`, `vehicle_categories`        |
 | Chrisha Lorraine Oira           |      [chrishalorraine]    | `reservations`, `rentals`                        |
 
+
 **Feature Assignments**
 |       Member       |      Endpoints / Screens      |      JOIN Reports and Types       |      Feature Role         |
 |--------------------|-------------------------------|-----------------------------------|---------------------------|
@@ -24,10 +26,14 @@
 | Jundarino          | To be determined              | To be determined                  | To be determined          |
 | Oira               | To be determined              | To be determined                  | To be determined          |
 
+
 **Project Description**
+
 The Vehicle Rental System is a database-driven application designed to manage vehicle rental operations and related records. It aims to organize information about vehicles, customers, employees, reservations, rentals, payments, and other related activities.
 
+
 **Technologies Used**
+
 - MySQL
 - Node.js
 - Express.js
@@ -35,5 +41,7 @@ The Vehicle Rental System is a database-driven application designed to manage ve
 - CSS
 - JavaScript
 
+
 **Project Status**
+
 Currently under development. Database implementation, API endpoints, frontend screens, and SQL reports will be documented as the project progresses.
