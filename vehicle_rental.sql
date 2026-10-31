@@ -1,9 +1,13 @@
+show databases;
+CREATE database VRENT_DATABASE_FINAL;
+USE VRENT_DATABASE_FINAL;
+
 -- ---------------------------------------------------------------------
--- 1. roles
+-- 1. vehicle_amenities
 -- ---------------------------------------------------------------------
-CREATE TABLE roles (
- role_id INT AUTO_INCREMENT PRIMARY KEY,
- role_name VARCHAR(50) NOT NULL UNIQUE,
+CREATE TABLE vehicle_amenities (
+ amenity_id INT AUTO_INCREMENT PRIMARY KEY,
+ amenity_name VARCHAR(100) NOT NULL UNIQUE,
  description VARCHAR(255)
 ) ENGINE=InnoDB;
 -- ---------------------------------------------------------------------
@@ -27,7 +31,6 @@ CREATE TABLE vehicle_categories (
  seating_capacity TINYINT UNSIGNED NOT NULL,
  CONSTRAINT chk_category_seats CHECK (seating_capacity BETWEEN 1 AND 60)
 ) ENGINE=InnoDB;
-
 -- ---------------------------------------------------------------------
 -- 4. customers
 -- ---------------------------------------------------------------------
