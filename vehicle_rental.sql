@@ -518,3 +518,5 @@ SELECT @@hostname AS server, @@port AS port, DATABASE() AS selected_database;
 SELECT customer_id, first_name, last_name, email
 FROM vehicle_rental.customers
 WHERE customer_id = 11;
+
+USE vehicle_rental;
