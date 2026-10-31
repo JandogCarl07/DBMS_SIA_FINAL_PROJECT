@@ -55,8 +55,7 @@ CREATE TABLE customers (
  emergency_contact_phone VARCHAR(20) NOT NULL,
  date_registered DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  status ENUM('Active','Blacklisted') NOT NULL DEFAULT 'Active',
- CONSTRAINT chk_customer_dates CHECK (license_expiry_date > DATE_ADD(birth_date, INTERVAL 18
-YEAR)),
+ CONSTRAINT chk_customer_dates CHECK (license_expiry_date > DATE_ADD(birth_date, INTERVAL 18 YEAR)),
  INDEX idx_cust_name (last_name, first_name)
 ) ENGINE=InnoDB;
 -- ---------------------------------------------------------------------
@@ -95,8 +94,7 @@ CREATE TABLE vehicles (
  NOT NULL DEFAULT 'Available',
  CONSTRAINT chk_vehicle_year CHECK (year BETWEEN 1990 AND 2100),
  CONSTRAINT chk_vehicle_seats CHECK (seats > 0),
- CONSTRAINT fk_veh_category FOREIGN KEY (category_id) REFERENCES
-vehicle_categories(category_id)
+ CONSTRAINT fk_veh_category FOREIGN KEY (category_id) REFERENCES vehicle_categories(category_id)
  ON DELETE RESTRICT ON UPDATE CASCADE,
  CONSTRAINT fk_veh_branch FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
  ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -104,61 +102,59 @@ vehicle_categories(category_id)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
---  7. rate_plans   (Daily 1-6 days, Weekly 7-29, Monthly 30+, seasonal)
+-- 7. vehicle_amenity_assignments
+-- ---------------------------------------------------------------------
+CREATE TABLE vehicle_amenity_assignments (
+ vehicle_id INT NOT NULL,
+ amenity_id INT NOT NULL,
+
+ PRIMARY KEY (vehicle_id, amenity_id),
+
+ CONSTRAINT fk_vaa_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
+ ON DELETE CASCADE ON UPDATE CASCADE,
+
+ CONSTRAINT fk_vaa_amenity FOREIGN KEY (amenity_id) REFERENCES vehicle_amenities(amenity_id)
+ ON DELETE CASCADE ON UPDATE CASCADE,
+ 
+ INDEX idx_vaa_ame
+ ) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- 8. rate_plans (Daily 1-6 days, Weekly 7-29, Monthly 30+, seasonal)
 -- ---------------------------------------------------------------------
 CREATE TABLE rate_plans (
-  rate_plan_id INT AUTO_INCREMENT PRIMARY KEY,
-  category_id  INT           NOT NULL,
-  plan_name    VARCHAR(50)   NOT NULL,
-  rate_per_day DECIMAL(10,2) NOT NULL,
-  min_days     INT           NOT NULL DEFAULT 1,
-  max_days     INT           NULL,
-  season_start DATE          NULL,
-  season_end   DATE          NULL,
-  CONSTRAINT chk_rate_amount  CHECK (rate_per_day > 0),
-  CONSTRAINT chk_rate_days    CHECK (min_days >= 1 AND (max_days IS NULL OR max_days >= min_days)),
-  CONSTRAINT chk_rate_season  CHECK (season_end IS NULL OR season_start IS NULL OR season_end >= season_start),
-  CONSTRAINT fk_rate_category FOREIGN KEY (category_id) REFERENCES vehicle_categories(category_id)
-    ON DELETE RESTRICT ON UPDATE CASCADE
+ rate_plan_id INT AUTO_INCREMENT PRIMARY KEY,
+ category_id INT NOT NULL,
+ plan_name VARCHAR(50) NOT NULL,
+ rate_per_day DECIMAL(10,2) NOT NULL,
+ min_days INT NOT NULL DEFAULT 1,
+ max_days INT NULL,
+ season_start DATE NULL,
+ season_end DATE NULL,
+ CONSTRAINT chk_rate_amount CHECK (rate_per_day > 0),
+ CONSTRAINT chk_rate_days CHECK (min_days >= 1 AND (max_days IS NULL OR max_days >= min_days)),
+ CONSTRAINT chk_rate_season CHECK (season_end IS NULL OR season_start IS NULL OR season_end >= season_start),
+ CONSTRAINT fk_rate_category FOREIGN KEY (category_id) REFERENCES vehicle_categories(category_id),
+ ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
---  8. insurance
+-- 9. insurance
 -- ---------------------------------------------------------------------
 CREATE TABLE insurance (
-  insurance_id    INT AUTO_INCREMENT PRIMARY KEY,
-  vehicle_id      INT           NOT NULL,
-  provider        VARCHAR(100)  NOT NULL,
-  policy_number   VARCHAR(50)   NOT NULL UNIQUE,
-  coverage_type   ENUM('Comprehensive','Third-Party','Collision') NOT NULL,
-  coverage_amount DECIMAL(12,2) NOT NULL,
-  start_date      DATE          NOT NULL,
-  expiry_date     DATE          NOT NULL,
-  CONSTRAINT chk_ins_amount CHECK (coverage_amount > 0),
-  CONSTRAINT chk_ins_dates  CHECK (expiry_date > start_date),
-  CONSTRAINT fk_ins_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
-  INDEX idx_ins_vehicle_expiry (vehicle_id, expiry_date)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
---  9. maintenance_records
--- ---------------------------------------------------------------------
-CREATE TABLE maintenance_records (
-  maintenance_id       INT AUTO_INCREMENT PRIMARY KEY,
-  vehicle_id           INT           NOT NULL,
-  service_type         VARCHAR(100)  NOT NULL,
-  description          TEXT,
-  service_date         DATE          NOT NULL,
-  next_service_date    DATE          NULL,
-  next_service_mileage INT UNSIGNED  NULL,
-  cost                 DECIMAL(10,2) NOT NULL DEFAULT 0,
-  status               ENUM('Scheduled','In Progress','Completed') NOT NULL DEFAULT 'Scheduled',
-  CONSTRAINT chk_maint_cost  CHECK (cost >= 0),
-  CONSTRAINT chk_maint_dates CHECK (next_service_date IS NULL OR next_service_date >= service_date),
-  CONSTRAINT fk_maint_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
-  INDEX idx_maint_vehicle_date (vehicle_id, service_date, status)
+ insurance_id INT AUTO_INCREMENT PRIMARY KEY,
+ vehicle_id INT NOT NULL,
+ provider VARCHAR(100) NOT NULL,
+ policy_number VARCHAR(50) NOT NULL UNIQUE,
+ coverage_type ENUM('Comprehensive','Third-Party','Collision') NOT NULL,
+ coverage_amount DECIMAL(12,2) NOT NULL,
+ start_date DATE NOT NULL,
+ expiry_date DATE NOT NULL,
+ CONSTRAINT chk_ins_amount CHECK (coverage_amount > 0),
+ CONSTRAINT chk_ins_dates CHECK (expiry_date > start_date),
+ CONSTRAINT fk_ins_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
+ ON DELETE RESTRICT ON UPDATE CASCADE,
+ INDEX idx_ins_vehicle_expiry (vehicle_id, expiry_date)
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------------
