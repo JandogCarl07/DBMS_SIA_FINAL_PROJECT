@@ -157,14 +157,14 @@ CREATE TABLE insurance (
  INDEX idx_ins_vehicle_expiry (vehicle_id, expiry_date)
 ) ENGINE=InnoDB;
 
--- ------------------------------------------------------------------
+--------------------------------------------------------------------
 --  10. reservations -- 
---------------------------------------------------------------------- 
+--------------------------------------------------------------------
 CREATE TABLE reservations ( 
   reservation_id INT AUTO_INCREMENT PRIMARY KEY, 
   customer_id    INT      NOT NULL, 
   vehicle_id     INT      NOT NULL, 
-  employee_id    INT      NOT NULL,   -- staff who encoded the booking 
+  employee_id    INT      NOT NULL,   
   start_date     DATE     NOT NULL, 
   end_date       DATE     NOT NULL, 
   status         ENUM('Pending','Confirmed','Cancelled','Completed','No-Show') 
@@ -181,20 +181,40 @@ CREATE TABLE reservations (
   INDEX idx_resv_vehicle_dates (vehicle_id, start_date, end_date) 
 ) ENGINE=InnoDB; 
 
- -- -------------------------------------------------------------------
-  --  11. rentals   (reservation_id NULL = walk-in) -- 
-  --------------------------------------------------------------------- 
+--------------------------------------------------------------------- 
+-- 11. reservations -- 
+--------------------------------------------------------------------- 
+CREATE TABLE reservations ( 
+  reservation_id INT AUTO_INCREMENT PRIMARY KEY, 
+  customer_id    INT      NOT NULL, 
+  vehicle_id     INT      NOT NULL, 
+  start_date     DATE     NOT NULL, 
+  end_date       DATE     NOT NULL, 
+  status         ENUM('Pending','Confirmed','Cancelled','Completed','No-Show') 
+                 NOT NULL DEFAULT 'Pending', 
+  created_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+  CONSTRAINT chk_resv_dates CHECK (end_date >= start_date), 
+  CONSTRAINT fk_resv_customer FOREIGN KEY (customer_id) REFERENCES customers(customer_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_resv_vehicle  FOREIGN KEY (vehicle_id)  REFERENCES vehicles(vehicle_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  -- speeds up the "is this vehicle free for these dates?" check 
+  INDEX idx_resv_vehicle_dates (vehicle_id, start_date, end_date) 
+) ENGINE=InnoDB;
+
+--------------------------------------------------------------------- 
+-- 12. rentals   (reservation_id NULL = walk-in) --
+--------------------------------------------------------------------- 
 CREATE TABLE rentals ( 
   rental_id        INT AUTO_INCREMENT PRIMARY KEY, 
   reservation_id   INT          NULL UNIQUE, 
   customer_id      INT          NOT NULL, 
   vehicle_id       INT          NOT NULL, 
-  employee_id      INT          NOT NULL, 
   pickup_branch_id INT          NOT NULL, 
   return_branch_id INT          NULL, 
   rental_date      DATETIME     NOT NULL, 
   due_date         DATETIME     NOT NULL, 
-  return_date      DATETIME     NULL,          -- NULL = not yet returned 
+  return_date      DATETIME     NULL,          
   start_mileage    INT UNSIGNED NOT NULL, 
   end_mileage      INT UNSIGNED NULL, 
   total_amount     DECIMAL(12,2) NOT NULL DEFAULT 0, 
@@ -202,22 +222,21 @@ CREATE TABLE rentals (
   CONSTRAINT chk_rental_due     CHECK (due_date > rental_date), 
   CONSTRAINT chk_rental_return  CHECK (return_date IS NULL OR return_date >= rental_date), 
   CONSTRAINT chk_rental_mileage CHECK (end_mileage IS NULL OR end_mileage >= start_mileage), 
-CONSTRAINT chk_rental_total   CHECK (total_amount >= 0), 
-CONSTRAINT fk_rent_reservation FOREIGN KEY (reservation_id)   REFERENCES reservations(reservation_id) 
-ON DELETE RESTRICT ON UPDATE CASCADE, 
-CONSTRAINT fk_rent_customer    FOREIGN KEY (customer_id)      REFERENCES customers(customer_id) 
-ON DELETE RESTRICT ON UPDATE CASCADE, 
-CONSTRAINT fk_rent_vehicle     FOREIGN KEY (vehicle_id)       REFERENCES vehicles(vehicle_id) 
-ON DELETE RESTRICT ON UPDATE CASCADE, 
-CONSTRAINT fk_rent_employee    FOREIGN KEY (employee_id)      REFERENCES employees(employee_id) 
-ON DELETE RESTRICT ON UPDATE CASCADE, 
-CONSTRAINT fk_rent_pickup      FOREIGN KEY (pickup_branch_id) REFERENCES branches(branch_id) 
-ON DELETE RESTRICT ON UPDATE CASCADE, 
-CONSTRAINT fk_rent_return      FOREIGN KEY (return_branch_id) REFERENCES branches(branch_id) 
-ON DELETE RESTRICT ON UPDATE CASCADE, 
-INDEX idx_rent_vehicle_status (vehicle_id, status, rental_date, due_date), 
-INDEX idx_rent_status (status) 
-) ENGINE=InnoDB;
+  CONSTRAINT chk_rental_total   CHECK (total_amount >= 0), 
+  CONSTRAINT fk_rent_reservation FOREIGN KEY (reservation_id)   REFERENCES 
+reservations(reservation_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_rent_customer    FOREIGN KEY (customer_id)      REFERENCES customers(customer_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_rent_vehicle     FOREIGN KEY (vehicle_id)       REFERENCES vehicles(vehicle_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_rent_pickup      FOREIGN KEY (pickup_branch_id) REFERENCES branches(branch_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_rent_return      FOREIGN KEY (return_branch_id) REFERENCES branches(branch_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  INDEX idx_rent_vehicle_status (vehicle_id, status, rental_date, due_date), 
+  INDEX idx_rent_status (status) 
+) ENGINE=InnoDB; 
 
 -- ---------------------------------------------------------------------
 --  14. rental_status_history
@@ -225,8 +244,8 @@ INDEX idx_rent_status (status)
 CREATE TABLE rental_status_history (
   history_id INT AUTO_INCREMENT PRIMARY KEY,
   rental_id  INT          NOT NULL,
-  changed_by INT          NOT NULL,   -- employee who made the change
-  old_status VARCHAR(30)  NULL,       -- NULL for the first status
+  changed_by INT          NOT NULL,   
+  old_status VARCHAR(30)  NULL,       
   new_status VARCHAR(30)  NOT NULL,
   changed_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   remarks    VARCHAR(255),
@@ -242,7 +261,7 @@ CREATE TABLE damage_reports (
   damage_id     INT AUTO_INCREMENT PRIMARY KEY,
   rental_id     INT           NOT NULL,
   vehicle_id    INT           NOT NULL,
-  reported_by   INT           NOT NULL,   -- employee who inspected the vehicle
+  reported_by   INT           NOT NULL,   
   description   TEXT          NOT NULL,
   severity      ENUM('Minor','Moderate','Major') NOT NULL,
   repair_cost   DECIMAL(10,2) NOT NULL DEFAULT 0,
@@ -265,7 +284,7 @@ CREATE TABLE damage_reports (
 CREATE TABLE activity_logs (
   log_id      INT AUTO_INCREMENT PRIMARY KEY,
   employee_id INT          NOT NULL,
-  action      VARCHAR(50)  NOT NULL,   -- e.g. CREATE, UPDATE, DELETE, LOGIN
+  action      VARCHAR(50)  NOT NULL,  
   table_name  VARCHAR(50)  NOT NULL,
   record_id   INT          NULL,
   description VARCHAR(255),
@@ -360,7 +379,6 @@ INSERT INTO rate_plans (category_id, plan_name, rate_per_day, min_days, max_days
 (5, 'Monthly',       450.00, 30, NULL, NULL,         NULL),
 (1, 'Holiday Peak', 2000.00, 1,  NULL, '2026-12-15', '2027-01-05');
 
--- Vehicle 10's policy is already expired; vehicle 12 has no policy yet
 INSERT INTO insurance (vehicle_id, provider, policy_number, coverage_type, coverage_amount, start_date, expiry_date) VALUES
 (1,  'Malayan Insurance', 'POL-2026-0001', 'Comprehensive', 800000.00,  '2026-01-01', '2026-12-31'),
 (2,  'Malayan Insurance', 'POL-2026-0002', 'Comprehensive', 750000.00,  '2026-01-01', '2026-12-31'),
@@ -384,7 +402,6 @@ INSERT INTO insurance (vehicle_id, provider, policy_number, coverage_type, cover
 (21, 'Malayan Insurance', 'POL-2026-0121', 'Comprehensive', 1700000.00, '2026-10-01', '2027-09-30'),
 (22, 'Malayan Insurance', 'POL-2026-0122', 'Collision',      120000.00, '2026-10-01', '2027-09-30');
 
--- Vehicle 1's next service date has already passed; vehicle 5 is in the shop now
 INSERT INTO maintenance_records (vehicle_id, service_type, description, service_date, next_service_date, next_service_mileage, cost, status) VALUES
 (1, 'Preventive Maintenance', 'Oil change and brake inspection',  '2026-07-01', '2026-10-01', 35000, 4500.00,  'Completed'),
 (3, 'Preventive Maintenance', 'Oil change and tire rotation',     '2026-08-10', '2026-11-10', 50000, 6200.00,  'Completed'),
@@ -403,7 +420,6 @@ INSERT INTO reservations (customer_id, vehicle_id, employee_id, start_date, end_
 (6, 4,  5, '2026-10-20', '2026-10-24', 'No-Show',   '2026-10-09 10:10:00'),
 (2, 1,  3, '2026-10-05', '2026-10-08', 'Cancelled', '2026-09-30 15:05:00');
 
--- reservation_id NULL = walk-in. Rentals 6 and 7 are OVERDUE (not yet returned)
 INSERT INTO rentals (reservation_id, customer_id, vehicle_id, employee_id, pickup_branch_id, return_branch_id,
                      rental_date, due_date, return_date, start_mileage, end_mileage, total_amount, status) VALUES
 (1,    1, 1,  3, 1, 1,    '2026-09-01 09:00:00', '2026-09-05 09:00:00', '2026-09-05 08:30:00', 30000, 30400, 6000.00,  'Returned'),
@@ -462,7 +478,6 @@ INSERT INTO activity_logs (employee_id, action, table_name, record_id, descripti
 (2, 'CREATE', 'rate_plans',   9,    'Added Holiday Peak plan for Sedans',     '2026-09-30 14:00:00'),
 (6, 'CREATE', 'late_fees',    3,    'Late fee computed for rental 6',         '2026-10-15 08:00:00'),
 (3, 'UPDATE', 'rentals',      7,    'Rental 7 marked Overdue',                '2026-10-17 09:05:00');
-
 
 -- =====================================================================
 --  CHECK: should return 16
