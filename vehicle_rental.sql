@@ -239,6 +239,38 @@ reservations(reservation_id)
 ) ENGINE=InnoDB; 
 
 -- ---------------------------------------------------------------------
+-- 13. payments
+-- ---------------------------------------------------------------------
+CREATE TABLE payments (
+ payment_id INT AUTO_INCREMENT PRIMARY KEY,
+ rental_id INT NOT NULL,
+ amount DECIMAL(10,2) NOT NULL,
+ payment_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ payment_method ENUM('Cash','GCash','Credit Card','Debit Card','Bank Transfer') NOT NULL,
+ payment_type ENUM('Deposit','Rental Fee','Late Fee','Damage Fee','Refund') NOT NULL,
+ reference_number VARCHAR(50) NULL UNIQUE,
+ status ENUM('Paid','Pending','Refunded','Failed') NOT NULL DEFAULT 'Paid',
+ CONSTRAINT chk_pay_amount CHECK (amount > 0),
+ CONSTRAINT fk_pay_rental FOREIGN KEY (rental_id) REFERENCES rentals(rental_id)
+ ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;
+-- ---------------------------------------------------------------------
+-- 14. late_fees
+-- ---------------------------------------------------------------------
+CREATE TABLE late_fees (
+ late_fee_id INT AUTO_INCREMENT PRIMARY KEY,
+ rental_id INT NOT NULL,
+ days_late INT NOT NULL,
+ fee_amount DECIMAL(10,2) NOT NULL,
+ computed_on DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ status ENUM('Unpaid','Paid','Waived') NOT NULL DEFAULT 'Unpaid',
+ CONSTRAINT chk_late_days CHECK (days_late > 0),
+ CONSTRAINT chk_late_fee CHECK (fee_amount >= 0),
+ CONSTRAINT fk_late_rental FOREIGN KEY (rental_id) REFERENCES rentals(rental_id)
+ ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- 15. rental_status_history
 -- ---------------------------------------------------------------------
 CREATE TABLE rental_status_history (
