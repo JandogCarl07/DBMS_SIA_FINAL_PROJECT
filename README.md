@@ -6,14 +6,14 @@
 **Proposed System Title:** Vehicle Rental System
 
 **Group Members and Responsibilities**
-|             Member              |      GitHub Username      |                  Assigned Tables                 |
-|---------------------------------|---------------------------|--------------------------------------------------|
-| Kenneth Duran                   |      [sleepy028]          | `rate_plans`, `insurance`, `maintenance_records` |
-| Ken Shinn B. Encarguez          |      [KenziiKen]          | `customers`, `employees`, `vehicles`             |
-| Samantha Yatoc Garcia           |      [samantha5357]       | `payments`, `late_fees`                          |
-| Carlos Emmanuel V. Jandog       |      [JandogCarl07]       | `rental_status_history`, `damage_reports`,            `activity_logs`                                                                                                  |
-| Shaira M. Jundarino             |      [sjndrno]            | `roles`, `branches`, `vehicle_categories`        |
-| Chrisha Lorraine Oira           |      [chrishalorraine]    | `reservations`, `rentals`                        |
+|             Member              |      GitHub Username      |                       Assigned Tables                    |
+|---------------------------------|---------------------------|----------------------------------------------------------|
+| Kenneth Duran                   |      [sleepy028]          | `rate_plans`, `insurance`, `vehicle_amenity_assignments` |
+| Ken Shinn B. Encarguez          |      [KenziiKen]          | `customers`, `password_reset_tokens`, `vehicles`         |
+| Samantha Yatoc Garcia           |      [samantha5357]       | `payments`, `late_fees`                                  |
+| Carlos Emmanuel V. Jandog       |      [JandogCarl07]       | `rental_status_history`, `damage_reports`,            `vehicle_ratings`                                                                                                        |
+| Shaira M. Jundarino             |      [sjndrno]            | `vehicle_amenities`, `branches`, `vehicle_categories`    |
+| Chrisha Lorraine Oira           |      [chrishalorraine]    | `reservations`, `rentals`, `maintenance_records`         |
 
 
 **Feature Assignments**
