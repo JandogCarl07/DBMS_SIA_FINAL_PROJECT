@@ -102,3 +102,60 @@ CONSTRAINT fk_veh_branch FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
 ON DELETE RESTRICT ON UPDATE CASCADE,
 INDEX idx_veh_status (status)
 ) ENGINE=InnoDB;
+
+
+-- ---------------------------------------------------------------------
+-- 7. vehicle_amenity_assignments
+-- ---------------------------------------------------------------------
+CREATE TABLE vehicle_amenity_assignments (
+vehicle_id INT NOT NULL,
+amenity_id INT NOT NULL,
+PRIMARY KEY (vehicle_id, amenity_id),
+CONSTRAINT fk_vaa_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
+ON DELETE CASCADE ON UPDATE CASCADE,
+CONSTRAINT fk_vaa_amenity FOREIGN KEY (amenity_id) REFERENCES vehicle_amenities(amenity_id)
+ON DELETE CASCADE ON UPDATE CASCADE,
+INDEX idx_vaa_amenity (amenity_id)
+) ENGINE=InnoDB;
+
+
+-- ---------------------------------------------------------------------
+-- 8. rate_plans (Daily 1-6 days, Weekly 7-29, Monthly 30+, seasonal)
+-- ---------------------------------------------------------------------
+CREATE TABLE rate_plans (
+rate_plan_id INT AUTO_INCREMENT PRIMARY KEY,
+category_id INT NOT NULL,
+plan_name VARCHAR(50) NOT NULL,
+rate_per_day DECIMAL(10,2) NOT NULL,
+min_days INT NOT NULL DEFAULT 1,
+max_days INT NULL,
+season_start DATE NULL,
+season_end DATE NULL,
+CONSTRAINT chk_rate_amount CHECK (rate_per_day > 0),
+CONSTRAINT chk_rate_days CHECK (min_days >= 1 AND (max_days IS NULL OR max_days >=
+min_days)),
+CONSTRAINT chk_rate_season CHECK (season_end IS NULL OR season_start IS NULL OR season_end
+>= season_start),
+CONSTRAINT fk_rate_category FOREIGN KEY (category_id) REFERENCES
+vehicle_categories(category_id)
+ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- 9. insurance
+-- ---------------------------------------------------------------------
+CREATE TABLE insurance (
+insurance_id INT AUTO_INCREMENT PRIMARY KEY,
+vehicle_id INT NOT NULL,
+provider VARCHAR(100) NOT NULL,
+policy_number VARCHAR(50) NOT NULL UNIQUE,
+coverage_type ENUM('Comprehensive','Third-Party','Collision') NOT NULL,
+coverage_amount DECIMAL(12,2) NOT NULL,
+start_date DATE NOT NULL,
+expiry_date DATE NOT NULL,
+CONSTRAINT chk_ins_amount CHECK (coverage_amount > 0),
+CONSTRAINT chk_ins_dates CHECK (expiry_date > start_date),
+CONSTRAINT fk_ins_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id)
+ON DELETE RESTRICT ON UPDATE CASCADE,
+INDEX idx_ins_vehicle_expiry (vehicle_id, expiry_date)
+) ENGINE=InnoDB;
