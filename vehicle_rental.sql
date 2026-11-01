@@ -131,12 +131,9 @@ max_days INT NULL,
 season_start DATE NULL,
 season_end DATE NULL,
 CONSTRAINT chk_rate_amount CHECK (rate_per_day > 0),
-CONSTRAINT chk_rate_days CHECK (min_days >= 1 AND (max_days IS NULL OR max_days >=
-min_days)),
-CONSTRAINT chk_rate_season CHECK (season_end IS NULL OR season_start IS NULL OR season_end
->= season_start),
-CONSTRAINT fk_rate_category FOREIGN KEY (category_id) REFERENCES
-vehicle_categories(category_id)
+CONSTRAINT chk_rate_days CHECK (min_days >= 1 AND (max_days IS NULL OR max_days >= min_days)),
+CONSTRAINT chk_rate_season CHECK (season_end IS NULL OR season_start IS NULL OR season_end >= season_start),
+CONSTRAINT fk_rate_category FOREIGN KEY (category_id) REFERENCES vehicle_categories(category_id)
 ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
