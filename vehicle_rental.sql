@@ -103,7 +103,6 @@ ON DELETE RESTRICT ON UPDATE CASCADE,
 INDEX idx_veh_status (status)
 ) ENGINE=InnoDB;
 
-
 -- ---------------------------------------------------------------------
 -- 7. vehicle_amenity_assignments
 -- ---------------------------------------------------------------------
@@ -141,6 +140,7 @@ vehicle_categories(category_id)
 ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
+
 -- ---------------------------------------------------------------------
 -- 9. insurance
 -- ---------------------------------------------------------------------
@@ -159,3 +159,4 @@ CONSTRAINT fk_ins_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_i
 ON DELETE RESTRICT ON UPDATE CASCADE,
 INDEX idx_ins_vehicle_expiry (vehicle_id, expiry_date)
 ) ENGINE=InnoDB;
+
