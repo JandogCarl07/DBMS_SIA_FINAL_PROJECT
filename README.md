@@ -1,7 +1,7 @@
 # DBMS 1 & SIA Final Project
 *Group 3*
 
-**Section:** To be provided
+**Section:** A
 
 **Proposed System Title:** Vehicle Rental System  
 **System Name:** V-RENT
