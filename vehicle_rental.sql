@@ -157,6 +157,84 @@ ON DELETE RESTRICT ON UPDATE CASCADE,
 INDEX idx_ins_vehicle_expiry (vehicle_id, expiry_date)
 ) ENGINE=InnoDB;
 
+--------------------------------------------------------------------- 
+-- 10. maintenance_records -- 
+--------------------------------------------------------------------- 
+CREATE TABLE maintenance_records ( 
+  maintenance_id       INT AUTO_INCREMENT PRIMARY KEY, 
+  vehicle_id           INT           NOT NULL, 
+  service_type         VARCHAR(100)  NOT NULL, 
+  description          TEXT, 
+  service_date         DATE          NOT NULL, 
+  next_service_date    DATE          NULL, 
+  next_service_mileage INT UNSIGNED  NULL, 
+  cost                 DECIMAL(10,2) NOT NULL DEFAULT 0, 
+  status               ENUM('Scheduled','In Progress','Completed') NOT NULL DEFAULT 'Scheduled', 
+  CONSTRAINT chk_maint_cost  CHECK (cost >= 0), 
+  CONSTRAINT chk_maint_dates CHECK (next_service_date IS NULL OR next_service_date >= 
+service_date), 
+  CONSTRAINT fk_maint_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  INDEX idx_maint_vehicle_date (vehicle_id, service_date, status) 
+) ENGINE=InnoDB; 
+
+ --------------------------------------------------------------------- 
+ -- 11. reservations -- 
+ --------------------------------------------------------------------- 
+CREATE TABLE reservations ( 
+  reservation_id INT AUTO_INCREMENT PRIMARY KEY, 
+  customer_id    INT      NOT NULL, 
+  vehicle_id     INT      NOT NULL, 
+  start_date     DATE     NOT NULL, 
+  end_date       DATE     NOT NULL, 
+  status         ENUM('Pending','Confirmed','Cancelled','Completed','No-Show') 
+                 NOT NULL DEFAULT 'Pending', 
+  created_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+  CONSTRAINT chk_resv_dates CHECK (end_date >= start_date), 
+  CONSTRAINT fk_resv_customer FOREIGN KEY (customer_id) REFERENCES customers(customer_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_resv_vehicle  FOREIGN KEY (vehicle_id)  REFERENCES vehicles(vehicle_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+   
+  INDEX idx_resv_vehicle_dates (vehicle_id, start_date, end_date) 
+) ENGINE=InnoDB; 
+
+ --------------------------------------------------------------------- 
+ -- 12. rentals    -- 
+ --------------------------------------------------------------------- 
+CREATE TABLE rentals ( 
+  rental_id        INT AUTO_INCREMENT PRIMARY KEY, 
+  reservation_id   INT          NULL UNIQUE, 
+  customer_id      INT          NOT NULL, 
+  vehicle_id       INT          NOT NULL, 
+  pickup_branch_id INT          NOT NULL, 
+  return_branch_id INT          NULL, 
+  rental_date      DATETIME     NOT NULL, 
+  due_date         DATETIME     NOT NULL, 
+  return_date      DATETIME     NULL,           
+  start_mileage    INT UNSIGNED NOT NULL, 
+  end_mileage      INT UNSIGNED NULL, 
+  total_amount     DECIMAL(12,2) NOT NULL DEFAULT 0, 
+  status           ENUM('Active','Returned','Overdue','Cancelled') NOT NULL DEFAULT 'Active', 
+  CONSTRAINT chk_rental_due     CHECK (due_date > rental_date), 
+  CONSTRAINT chk_rental_return  CHECK (return_date IS NULL OR return_date >= rental_date), 
+  CONSTRAINT chk_rental_mileage CHECK (end_mileage IS NULL OR end_mileage >= start_mileage), 
+  CONSTRAINT chk_rental_total   CHECK (total_amount >= 0), 
+  CONSTRAINT fk_rent_reservation FOREIGN KEY (reservation_id)   REFERENCES 
+reservations(reservation_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_rent_customer    FOREIGN KEY (customer_id)      REFERENCES customers(customer_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_rent_vehicle     FOREIGN KEY (vehicle_id)       REFERENCES vehicles(vehicle_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_rent_pickup      FOREIGN KEY (pickup_branch_id) REFERENCES branches(branch_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  CONSTRAINT fk_rent_return      FOREIGN KEY (return_branch_id) REFERENCES branches(branch_id) 
+    ON DELETE RESTRICT ON UPDATE CASCADE, 
+  INDEX idx_rent_vehicle_status (vehicle_id, status, rental_date, due_date), 
+  INDEX idx_rent_status (status) 
+) ENGINE=InnoDB;
+
 -- ---------------------------------------------------------------------
 -- 15. rental_status_history
 -- ---------------------------------------------------------------------
