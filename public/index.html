@@ -1,0 +1,564 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>V-RENT | Find and Reserve Your Ride</title>
+  <meta
+    name="description"
+    content="Browse vehicles, compare rental prices, and reserve your ride with V-RENT."
+  >
+
+  <link rel="icon" href="favicon.png">
+  <link rel="stylesheet" href="site.css">
+
+  <script src="theme.js"></script>
+</head>
+
+<body>
+
+  <body>
+
+    <section id="welcomeCover">
+        <div class="welcome-content">
+
+            <img
+                src="logo.png"
+                alt="V-RENT Logo"
+                class="welcome-logo"
+            >
+
+            <h1>V-RENT</h1>
+            <p>Your journey starts here.</p>
+
+            <div class="welcome-actions">
+                <button class="btn" id="coverLogin" type="button">
+                    Log In
+                </button>
+
+                <button class="btn ghost" id="coverSignup" type="button">
+                    Sign Up
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    <a class="skip" href="#cars">Skip to the cars</a>
+
+    <header class="nav" id="top">
+
+    </header>
+
+
+</body>
+      </button>
+    </div>
+  </div>
+</section>
+  <a class="skip" href="#cars">Skip to the cars</a>
+
+  <header class="nav" id="top">
+    <div class="wrap nav-in">
+
+      <a class="logo" href="#top" aria-label="V-RENT home">
+        <img src="logo-transparent.png" alt="">
+        <span>V-<b>RENT</b></span>
+      </a>
+
+      <button
+        class="burger"
+        id="burger"
+        type="button"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="navLinks"
+      >
+        &#9776;
+      </button>
+
+      <nav class="links" id="navLinks" aria-label="Main navigation">
+        <a href="#cars" data-home>Vehicles</a>
+        <a href="#amenities" data-home>Amenities</a>
+        <a href="#how" data-home>How it works</a>
+        <a href="#branches" data-home>Locations</a>
+
+        <span class="sep" aria-hidden="true"></span>
+
+        <button
+          class="theme"
+          data-theme-toggle
+          type="button"
+          aria-label="Switch to dark mode"
+        ></button>
+
+        <span id="guestButtons">
+          <button class="btn ghost" id="loginBtn" type="button">Log in</button>
+          <button class="btn" id="signupBtn" type="button">Sign up</button>
+        </span>
+
+        <span id="userButtons" hidden>
+          <button class="btn ghost" id="accountBtn" type="button">My Account</button>
+          <button class="btn ghost" id="logoutBtn" type="button">Log out</button>
+        </span>
+      </nav>
+
+    </div>
+  </header>
+
+  <main>
+
+    <div id="pageHome">
+
+      <section class="hero">
+        <div class="wrap hero-in">
+
+          <div class="hero-text">
+            <p class="eyebrow">Your journey starts here</p>
+
+            <h1>
+              Find your ride.<br>
+              Enjoy the journey.
+            </h1>
+
+            <p class="lead">
+              Choose from our selection of cars, SUVs, vans, pickups,
+              and motorcycles. Find the right vehicle and reserve it
+              with just a few steps.
+            </p>
+
+            <a class="hero-link" href="#cars">Explore our vehicles &darr;</a>
+          </div>
+
+          <form class="search card" id="searchForm" novalidate>
+            <div class="search-heading">
+              <span class="search-icon" aria-hidden="true">&#128663;</span>
+              <div>
+                <h2>Find your vehicle</h2>
+                <p class="muted">Enter your rental details to get started.</p>
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="f">
+                <label for="sStart">Pick-up date</label>
+                <input type="date" id="sStart" required>
+              </div>
+
+              <div class="f">
+                <label for="sEnd">Return date</label>
+                <input type="date" id="sEnd" required>
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="f" id="branchField">
+                <label for="sBranch">Pick-up branch</label>
+                <select id="sBranch">
+                  <option value="">Any branch</option>
+                </select>
+              </div>
+
+              <div class="f">
+                <label for="sCat">Vehicle type</label>
+                <select id="sCat">
+                  <option value="">Any type</option>
+                </select>
+              </div>
+            </div>
+
+            <p class="err" id="searchErr" role="alert"></p>
+
+            <button class="btn big" type="submit">
+              Search available vehicles
+            </button>
+
+            <p class="search-note">
+              Choose your dates and preferred vehicle type.
+            </p>
+          </form>
+
+        </div>
+      </section>
+
+      <section class="stats wrap" aria-label="Our fleet in numbers">
+
+        <div>
+          <b id="nVehicles">-</b>
+          <span>Vehicles</span>
+        </div>
+
+        <div>
+          <b id="nCats">-</b>
+          <span>Vehicle types</span>
+        </div>
+
+        <div>
+          <b id="nAmen">-</b>
+          <span>Amenities</span>
+        </div>
+
+        <div>
+          <b id="nRating">-</b>
+          <span>Average rating</span>
+        </div>
+
+      </section>
+
+      <section class="wrap section" id="amenities">
+        <div class="section-heading">
+          <p class="eyebrow section-eyebrow">Extra comfort</p>
+          <h2>Choose the features you need</h2>
+          <p class="muted">
+            Explore the amenities available with our vehicles.
+            You can also select an amenity to filter the fleet.
+          </p>
+        </div>
+
+        <div class="amen-grid" id="amenGrid"></div>
+      </section>
+
+      <section class="wrap section" id="cars">
+
+        <div class="sec-head">
+          <div>
+            <p class="eyebrow section-eyebrow">Explore our collection</p>
+            <h2>Find the right vehicle for you</h2>
+            <p class="muted" id="carsHint">
+              Showing every vehicle. Pick your dates above to see what is free.
+            </p>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <h3>Vehicle categories</h3>
+          <div class="chips" id="chips" role="group" aria-label="Vehicle type"></div>
+        </div>
+
+        <div class="filter-section">
+          <h3>Available amenities</h3>
+          <div class="chips" id="amChips" role="group" aria-label="Amenities"></div>
+        </div>
+
+        <div class="filters">
+
+          <input
+            type="search"
+            id="fSearch"
+            placeholder="Search brand or model..."
+            aria-label="Search brand or model"
+          >
+
+          <select id="fTrans" aria-label="Transmission">
+            <option value="">Any transmission</option>
+            <option>Automatic</option>
+            <option>Manual</option>
+          </select>
+
+          <select id="fSort" aria-label="Sort vehicles">
+            <option value="">Recommended</option>
+            <option value="low">Price: low to high</option>
+            <option value="high">Price: high to low</option>
+          </select>
+
+          <label class="check">
+            <input type="checkbox" id="fAvail">
+            <span>Available only</span>
+          </label>
+
+        </div>
+
+        <p class="muted car-count" id="carCount" aria-live="polite"></p>
+
+        <div class="cars" id="carGrid"></div>
+
+      </section>
+
+      <section class="how" id="how">
+        <div class="wrap section">
+
+          <div class="section-heading">
+            <p class="eyebrow section-eyebrow">Simple and convenient</p>
+            <h2>How V-RENT works</h2>
+            <p class="muted">
+              Reserving a vehicle is simple. Follow these three steps.
+            </p>
+          </div>
+
+          <ol class="steps3">
+
+            <li>
+              <span>1</span>
+              <h3>Choose your vehicle</h3>
+              <p>
+                Browse our fleet, compare available vehicles,
+                and check their rental prices.
+              </p>
+            </li>
+
+            <li>
+              <span>2</span>
+              <h3>Create an account and reserve</h3>
+              <p>
+                Sign up or log in, select your rental dates,
+                and submit your reservation.
+              </p>
+            </li>
+
+            <li>
+              <span>3</span>
+              <h3>Pick up your vehicle</h3>
+              <p>
+                Wait for booking confirmation, then visit
+                your selected branch with your valid driver's license.
+              </p>
+            </li>
+
+          </ol>
+        </div>
+      </section>
+
+      <section class="wrap section" id="branches">
+
+        <div class="section-heading">
+          <p class="eyebrow section-eyebrow">Find us</p>
+          <h2>Our branch locations</h2>
+          <p class="muted">
+            Choose a convenient location for your vehicle pick-up.
+          </p>
+        </div>
+
+        <div class="branches" id="branchGrid"></div>
+
+      </section>
+
+    </div>
+
+    <div id="pageAccount" class="wrap section" hidden>
+
+      <button class="btn ghost" id="backHome" type="button">
+        &larr; Back to vehicles
+      </button>
+
+      <div class="account-heading">
+        <p class="eyebrow section-eyebrow">Personal dashboard</p>
+        <h1 id="welcome" tabindex="-1">My Account</h1>
+        <p class="muted">
+          Manage your reservations, rentals, ratings, and profile.
+        </p>
+      </div>
+
+      <div class="tabs" role="tablist" id="accTabs">
+        <button role="tab" aria-selected="true" data-tab="reservations">
+          My reservations
+        </button>
+
+        <button role="tab" aria-selected="false" data-tab="rentals">
+          My rentals
+        </button>
+
+        <button role="tab" aria-selected="false" data-tab="ratings">
+          Rate my rides
+        </button>
+
+        <button role="tab" aria-selected="false" data-tab="profile">
+          My profile
+        </button>
+      </div>
+
+      <div id="accBody"></div>
+
+    </div>
+
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-content">
+
+      <div>
+        <a class="foot-logo" href="#top">V-RENT</a>
+        <p>Vehicle rental made simple.</p>
+      </div>
+
+      <div class="foot-links">
+        <a href="#cars">Vehicles</a>
+        <a href="#how">How it works</a>
+        <a href="#branches">Locations</a>
+        <a href="/admin.html">Admin login</a>
+      </div>
+
+      <p class="copyright">&copy; V-RENT Vehicle Rental</p>
+
+    </div>
+  </footer>
+
+  <div class="overlay" id="carModal" hidden>
+    <div
+      class="modal big-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="carTitle"
+    >
+      <button class="x" data-close type="button" aria-label="Close">
+        &times;
+      </button>
+
+      <div class="car-detail" id="carDetail"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="authModal" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="authTitle"
+    >
+
+      <button class="x" data-close type="button" aria-label="Close">
+        &times;
+      </button>
+
+      <div class="auth-logo">
+        <img src="logo-transparent.png" alt="V-RENT">
+      </div>
+
+      <h2 id="authTitle">Welcome back</h2>
+
+      <p class="notice" id="authNotice" hidden></p>
+
+      <form id="loginForm" novalidate>
+
+        <div class="f">
+          <label for="lEmail">Email address</label>
+          <input
+            id="lEmail"
+            type="email"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div class="f">
+          <label for="lPass">Password</label>
+          <input
+            id="lPass"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <p class="err" id="loginErr" role="alert"></p>
+
+        <button class="btn big" type="submit">Log in</button>
+
+        <p class="switch">
+          <button type="button" class="link-btn" id="toForgot">
+            Forgot your password?
+          </button>
+        </p>
+
+        <p class="switch">
+          New here?
+          <a href="#" id="toSignup">Create an account</a>
+        </p>
+
+      </form>
+
+      <form id="forgotForm" novalidate hidden>
+
+        <p class="muted form-description">
+          Enter your email address and follow the instructions
+          to reset your password.
+        </p>
+
+        <div class="f">
+          <label for="fgEmail">Email address</label>
+          <input
+            id="fgEmail"
+            type="email"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <p class="err" id="fgErr" role="alert"></p>
+        <p class="success" id="fgOk" role="status" hidden></p>
+
+        <button class="btn big" type="submit">Send reset link</button>
+
+        <p class="switch">
+          <a href="#" id="fgBack">Back to log in</a>
+        </p>
+
+      </form>
+
+      <form id="resetForm" novalidate hidden>
+
+        <div class="f">
+          <label for="rsPass">New password (at least 8 characters)</label>
+          <input
+            id="rsPass"
+            type="password"
+            autocomplete="new-password"
+            required
+          >
+        </div>
+
+        <div class="f">
+          <label for="rsPass2">Confirm new password</label>
+          <input
+            id="rsPass2"
+            type="password"
+            autocomplete="new-password"
+            required
+          >
+        </div>
+
+        <p class="err" id="rsErr" role="alert"></p>
+
+        <button class="btn big" type="submit">
+          Change my password
+        </button>
+
+      </form>
+
+      <form id="signupForm" novalidate hidden>
+
+        <ol class="progress" id="suProgress"></ol>
+
+        <div id="suFields"></div>
+
+        <p class="err" id="suErr" role="alert"></p>
+
+        <div class="row-btn">
+          <button type="button" class="btn ghost" id="suBack">
+            Back
+          </button>
+
+          <button type="submit" class="btn" id="suNext">
+            Next
+          </button>
+        </div>
+
+        <p class="switch">
+          Already have an account?
+          <a href="#" id="toLogin">Log in</a>
+        </p>
+
+      </form>
+
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+
+  <script src="vehicle-art.js"></script>
+  <script src="site.js"></script>
+
+</body>
+</html>

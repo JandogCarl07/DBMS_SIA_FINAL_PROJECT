@@ -1,0 +1,954 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>V-RENT Admin | Vehicle Rental Management</title>
+
+    <link rel="icon" href="favicon.png">
+
+   
+    <script src="theme.js"></script>
+
+   
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="login-screen" id="loginScreen" hidden>
+
+        <form class="login-card card" id="loginForm" novalidate>
+
+            <img
+                class="login-logo"
+                src="logo-transparent.png"
+                alt="V-RENT logo"
+            >
+
+            <p class="muted" style="text-align: center;">
+                Admin sign in
+            </p>
+
+            <div class="field">
+                <label for="loginUser">Admin username</label>
+                <input
+                    id="loginUser"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="field">
+                <label for="loginPass">Password</label>
+                <input
+                    id="loginPass"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button
+                class="btn"
+                type="submit"
+                style="width: 100%;"
+            >
+                Log in
+            </button>
+
+            <p
+                class="muted"
+                style="text-align: center; margin-top: .75rem;"
+            >
+                <a href="/">&larr; Back to the customer website</a>
+            </p>
+
+        </form>
+    </div>
+
+
+    <div class="app" id="appRoot" hidden>
+
+        <aside
+            class="sidebar"
+            id="sidebar"
+            aria-label="Main navigation"
+        >
+
+            <div class="brand">
+                <img
+                    class="brand-logo"
+                    src="logo-transparent.png"
+                    alt=""
+                >
+                V-<span>RENT</span>
+            </div>
+
+            <ul class="nav">
+
+                <li>
+                    <button
+                        data-view="dashboard"
+                        aria-current="page"
+                    >
+                        Dashboard
+                    </button>
+                </li>
+
+                <li>
+                    <button data-view="vehicles">
+                        Vehicle Fleet
+                    </button>
+                </li>
+
+                <li>
+                    <button data-view="rentals">
+                        Rentals
+                    </button>
+                </li>
+
+                <li>
+                    <button data-view="overdue">
+                        Late Fees &amp; Overdue
+                    </button>
+                </li>
+
+                <li>
+                    <button data-view="reports">
+                        Join Reports
+                    </button>
+                </li>
+
+                <li>
+                    <button data-view="records">
+                        Records (CRUD)
+                    </button>
+                </li>
+
+            </ul>
+        </aside>
+
+        <div class="main">
+
+            <header class="topbar">
+
+                <button
+                    class="menu-toggle"
+                    id="menuToggle"
+                    aria-label="Toggle menu"
+                    aria-expanded="false"
+                    aria-controls="sidebar"
+                >
+                    &#9776;
+                </button>
+
+                <label class="sr-only" for="branchSelect">
+                    Branch filter
+                </label>
+
+                <select id="branchSelect">
+                    <option value="">All branches</option>
+                </select>
+
+                <span class="spacer"></span>
+
+                <button
+                    class="theme-btn"
+                    data-theme-toggle
+                    type="button"
+                    aria-label="Switch to dark mode"
+                ></button>
+
+                <div class="user">
+
+                    <span
+                        class="avatar"
+                        id="userAvatar"
+                        aria-hidden="true"
+                    >
+                        ?
+                    </span>
+
+                    <span>
+                        <strong id="userName"></strong>
+                        <br>
+                        <small id="userRole"></small>
+                    </span>
+
+                </div>
+
+                <button
+                    class="btn btn-outline btn-sm"
+                    id="logoutBtn"
+                >
+                    Logout
+                </button>
+
+            </header>
+
+
+            <main class="content" id="main">
+
+                <section class="view" id="view-dashboard">
+
+                    <h1>Dashboard</h1>
+
+                    <div class="grid stats">
+
+                        <div class="card stat info">
+                            <div class="label">Total Vehicles</div>
+                            <div class="value" id="statVehicles">-</div>
+                        </div>
+
+                        <div class="card stat ok">
+                            <div class="label">Active Rentals</div>
+                            <div class="value" id="statActive">-</div>
+                        </div>
+
+                        <div class="card stat warn">
+                            <div class="label">Overdue Rentals</div>
+                            <div class="value" id="statOverdue">-</div>
+                        </div>
+
+                        <div class="card stat info">
+                            <div class="label">Revenue (paid)</div>
+                            <div class="value" id="statRevenue">-</div>
+                        </div>
+
+                        <div class="card stat warn">
+                            <div class="label">Unpaid Late Fees</div>
+                            <div class="value" id="statLateFees">-</div>
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <h2>Quick Actions</h2>
+
+                        <form class="toolbar" id="quickSearchForm">
+
+                            <label
+                                class="sr-only"
+                                for="quickSearch"
+                            >
+                                Search by plate number or customer name
+                            </label>
+
+                            <input
+                                class="search"
+                                id="quickSearch"
+                                type="search"
+                                placeholder="Search by plate # or customer name"
+                            >
+
+                            <button
+                                class="btn btn-outline"
+                                type="submit"
+                            >
+                                Search
+                            </button>
+
+                            <button
+                                class="btn"
+                                type="button"
+                                id="newRentalBtn"
+                            >
+                                + New Rental
+                            </button>
+
+                            <button
+                                class="btn btn-outline"
+                                type="button"
+                                id="newReservationBtn"
+                            >
+                                + New Reservation
+                            </button>
+
+                        </form>
+
+                        <div id="searchResults"></div>
+
+                    </div>
+
+                </section>
+
+                <section
+                    class="view"
+                    id="view-vehicles"
+                    hidden
+                >
+
+                    <h1>Vehicle Fleet</h1>
+
+                    <div class="toolbar">
+
+                        <input
+                            id="fQ"
+                            type="search"
+                            placeholder="Search plate, brand, model"
+                            aria-label="Search vehicles"
+                        >
+
+                        <select id="fBranch" aria-label="Branch">
+                            <option value="">All branches</option>
+                        </select>
+
+                        <select id="fCategory" aria-label="Category">
+                            <option value="">All categories</option>
+                            <option>Sedan</option>
+                            <option>SUV</option>
+                            <option>Van</option>
+                            <option>Pickup</option>
+                            <option>Motorcycle</option>
+                        </select>
+
+                        <select
+                            id="fTransmission"
+                            aria-label="Transmission"
+                        >
+                            <option value="">Any transmission</option>
+                            <option>Automatic</option>
+                            <option>Manual</option>
+                        </select>
+
+                        <select id="fStatus" aria-label="Status">
+                            <option value="">Any status</option>
+                            <option>Available</option>
+                            <option>Reserved</option>
+                            <option>Rented</option>
+                            <option>Maintenance</option>
+                            <option>Overdue</option>
+                            <option>Unavailable</option>
+                        </select>
+
+                        <button
+                            class="btn"
+                            id="addVehicleBtn"
+                            hidden
+                        >
+                            + Add Vehicle
+                        </button>
+
+                    </div>
+
+                    <div
+                        class="grid vehicle-grid"
+                        id="vehicleGrid"
+                    ></div>
+
+                </section>
+
+                <section
+                    class="view"
+                    id="view-rentals"
+                    hidden
+                >
+
+                    <h1>Rentals</h1>
+
+                    <div class="toolbar">
+
+                        <input
+                            id="rQ"
+                            type="search"
+                            placeholder="Search customer or plate"
+                            aria-label="Search rentals"
+                        >
+
+                        <select
+                            id="rStatusFilter"
+                            aria-label="Status"
+                        >
+                            <option value="">Any status</option>
+                            <option>Active</option>
+                            <option>Overdue</option>
+                            <option>Returned</option>
+                            <option>Cancelled</option>
+                        </select>
+
+                        <button
+                            class="btn"
+                            id="newRentalBtn2"
+                        >
+                            + Create New Rental
+                        </button>
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Vehicle</th>
+                                    <th>Pickup</th>
+                                    <th>Due</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="rentalBody"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+                <section
+                    class="view"
+                    id="view-overdue"
+                    hidden
+                >
+
+                    <h1>Late Fees &amp; Overdue Monitoring</h1>
+
+                    <div
+                        class="banner banner-overdue"
+                        role="alert"
+                        id="overdueBanner"
+                    ></div>
+
+                    <div class="toolbar">
+
+                        <button
+                            class="btn btn-warn"
+                            id="runCheckBtn"
+                        >
+                            Run Overdue Check
+                        </button>
+
+                        <span class="muted">
+                            The system also runs this check automatically on a schedule.
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="grid fee-summary"
+                        id="feeCards"
+                    ></div>
+
+                    <h2>Late fee records</h2>
+
+                    <div class="table-wrap">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Fee ID</th>
+                                    <th>Rental</th>
+                                    <th>Customer</th>
+                                    <th>Vehicle</th>
+                                    <th>Days late</th>
+                                    <th>Fee</th>
+                                    <th>Computed</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="feeBody"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+                <section
+                    class="view"
+                    id="view-reports"
+                    hidden
+                >
+
+                    <h1>Join Reports &amp; Analytics</h1>
+
+                    <div
+                        class="tabs"
+                        role="tablist"
+                        id="reportTabs"
+                    >
+
+                        <button
+                            role="tab"
+                            aria-selected="true"
+                            data-report="active"
+                        >
+                            Active Rental Overview
+                        </button>
+
+                        <button
+                            role="tab"
+                            aria-selected="false"
+                            data-report="unlinked"
+                        >
+                            Unlinked / Inactive Audit
+                        </button>
+
+                        <button
+                            role="tab"
+                            aria-selected="false"
+                            data-report="activity"
+                        >
+                            System Activity Logs
+                        </button>
+
+                    </div>
+
+                    <div class="toolbar">
+
+                        <label
+                            for="reportSub"
+                            class="sr-only"
+                        >
+                            Report
+                        </label>
+
+                        <select id="reportSub"></select>
+
+                        <span
+                            class="muted"
+                            id="reportCount"
+                        ></span>
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+
+                            <thead id="reportHead"></thead>
+
+                            <tbody id="reportBody"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+                <section
+                    class="view"
+                    id="view-records"
+                    hidden
+                >
+
+                    <h1>Records</h1>
+
+                    <div class="toolbar">
+
+                        <label
+                            for="recSelect"
+                            class="sr-only"
+                        >
+                            Table
+                        </label>
+
+                        <select id="recSelect"></select>
+
+                        <button
+                            class="btn"
+                            id="recAddBtn"
+                        >
+                            + Add
+                        </button>
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+
+                            <thead id="recHead"></thead>
+
+                            <tbody id="recBody"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <div
+        class="modal-backdrop"
+        id="rentalModal"
+        hidden
+    >
+
+        <div
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rentalModalTitle"
+        >
+
+            <div class="modal-head">
+
+                <h2 id="rentalModalTitle">
+                    Create New Rental
+                </h2>
+
+                <button
+                    class="btn btn-outline btn-sm"
+                    data-close
+                    aria-label="Close"
+                >
+                    &times;
+                </button>
+
+            </div>
+
+            <ol class="steps">
+                <li class="active">1. Customer &amp; Vehicle</li>
+                <li>2. Branch &amp; Dates</li>
+                <li>3. Rate &amp; Total</li>
+            </ol>
+
+            <form id="rentalForm" novalidate>
+          
+                <div data-step="1">
+
+                    <div class="field">
+                        <label for="rCustomer">Customer</label>
+                        <select id="rCustomer" required></select>
+                    </div>
+
+                    <div class="field">
+                        <label for="rVehicle">Vehicle</label>
+                        <select id="rVehicle" required></select>
+                    </div>
+
+                    <p
+                        class="warn-text"
+                        id="rWarn"
+                        role="alert"
+                    ></p>
+
+                </div>
+
+                <div data-step="2" hidden>
+
+                    <div class="field">
+                        <label for="rPickup">Pickup branch</label>
+                        <select id="rPickup"></select>
+                    </div>
+
+                    <div class="field">
+                        <label for="rStart">Pickup date &amp; time</label>
+                        <input
+                            type="datetime-local"
+                            id="rStart"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="rDue">Due date &amp; time</label>
+                        <input
+                            type="datetime-local"
+                            id="rDue"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+    
+                <div data-step="3" hidden>
+
+                    <div class="field">
+                        <label for="rPlan">Rate plan</label>
+                        <select id="rPlan"></select>
+                    </div>
+
+                    <div
+                        class="total-box"
+                        id="rTotal"
+                        aria-live="polite"
+                    >
+                        Total: -
+                    </div>
+
+                </div>
+
+                <div class="modal-foot">
+
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        id="stepBack"
+                    >
+                        Back
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn"
+                        id="stepNext"
+                    >
+                        Next
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div
+        class="modal-backdrop"
+        id="returnModal"
+        hidden
+    >
+
+        <div
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="returnTitle"
+        >
+
+            <div class="modal-head">
+
+                <h2 id="returnTitle">Return Vehicle</h2>
+
+                <button
+                    class="btn btn-outline btn-sm"
+                    data-close
+                    aria-label="Close"
+                >
+                    &times;
+                </button>
+
+            </div>
+
+            <form id="returnForm" novalidate>
+
+                <div class="field">
+                    <label for="retDate">Return date &amp; time</label>
+                    <input
+                        type="datetime-local"
+                        id="retDate"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="retMileage">End mileage</label>
+                    <input
+                        type="number"
+                        id="retMileage"
+                        min="0"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="retBranch">Return branch</label>
+                    <select id="retBranch"></select>
+                </div>
+
+                <div
+                    class="total-box"
+                    id="retSummary"
+                    aria-live="polite"
+                >
+                    Late fee: none
+                </div>
+
+                <div class="field" style="margin-top: .75rem;">
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            id="retPay"
+                        >
+                        Collect the late fee payment now
+                    </label>
+
+                </div>
+
+                <div class="field">
+
+                    <label for="retMethod">Payment method</label>
+
+                    <select id="retMethod">
+                        <option>Cash</option>
+                        <option>GCash</option>
+                        <option>Credit Card</option>
+                        <option>Debit Card</option>
+                        <option>Bank Transfer</option>
+                    </select>
+
+                </div>
+
+                <div class="field">
+
+                    <label for="retRef">
+                        Reference number (non-cash)
+                    </label>
+
+                    <input id="retRef">
+
+                </div>
+
+                <div class="modal-foot">
+
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        data-close
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn"
+                    >
+                        Process Return
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div
+        class="modal-backdrop"
+        id="formModal"
+        hidden
+    >
+
+        <div
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="formTitle"
+        >
+
+            <div class="modal-head">
+
+                <h2 id="formTitle"></h2>
+
+                <button
+                    class="btn btn-outline btn-sm"
+                    data-close
+                    aria-label="Close"
+                >
+                    &times;
+                </button>
+
+            </div>
+
+            <form id="genericForm" novalidate>
+
+                <div id="formBody"></div>
+
+                <div class="modal-foot">
+
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        data-close
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn"
+                        id="formSubmit"
+                    >
+                        Save
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div
+        class="modal-backdrop"
+        id="infoModal"
+        hidden
+    >
+
+        <div
+            class="modal modal-wide"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="infoTitle"
+        >
+
+            <div class="modal-head">
+
+                <h2 id="infoTitle"></h2>
+
+                <button
+                    class="btn btn-outline btn-sm"
+                    data-close
+                    aria-label="Close"
+                >
+                    &times;
+                </button>
+
+            </div>
+
+            <div id="infoBody"></div>
+
+        </div>
+
+    </div>
+
+    <div
+        class="spinner-overlay"
+        id="spinner"
+        hidden
+        role="status"
+        aria-live="polite"
+    >
+
+        <div class="spinner"></div>
+
+        <span class="sr-only">Loading</span>
+
+    </div>
+
+    <div
+        class="toast-region"
+        id="toasts"
+        aria-live="polite"
+        aria-atomic="false"
+    ></div>
+
+    <script src="vehicle-art.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>
