@@ -290,11 +290,7 @@ The following responsibilities are based on the actual database tables and their
   - `rentals` + `reservations` + `customers` + `vehicles` + `branches` — `INNER JOIN`
   - `maintenance_records` + `vehicles` — `INNER JOIN`
 - **Feature role:** Reservation, Rental, and Maintenance Developer. Manages reservations, rental transactions, pickup and return information, and maintenance records.
-
-**Note:**** These are proposed responsibilities based on the database schema. Actual implementation should follow the existing project routes, database columns, and foreign key relationships.
-
----
-
+  
 ---
 
 ## API Documentation
